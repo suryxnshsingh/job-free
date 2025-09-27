@@ -1,0 +1,383 @@
+# =================================================================
+# BLOCKCHAIN FREELANCING PLATFORM - GIT IGNORE
+# =================================================================
+
+# =================================================================
+# ENVIRONMENT & SECRETS
+# =================================================================
+
+# Private keys and sensitive data
+private-keys/
+secrets/
+*.key
+*.pem
+*.p12
+*.pfx
+
+# =================================================================
+# NODE.JS & NPM
+# =================================================================
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# nyc test coverage
+.nyc_output
+
+# Grunt intermediate storage
+.grunt
+
+# Bower dependency directory
+.bower_components
+
+# node-waf configuration
+.lock-wscript
+
+# Compiled binary addons
+build/Release
+
+# Dependency directories
+jspm_packages/
+
+# TypeScript v1 declaration files
+typings/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# parcel-bundler cache
+.cache
+.parcel-cache
+
+# =================================================================
+# NEXT.JS FRONTEND
+# =================================================================
+frontend/.next/
+frontend/out/
+frontend/build
+frontend/dist
+frontend/.vercel
+frontend/.turbo
+
+# =================================================================
+# BACKEND BUILD
+# =================================================================
+backend/dist/
+backend/build/
+backend/lib/
+backend/.turbo
+
+# =================================================================
+# SMART CONTRACTS
+# =================================================================
+contracts/artifacts/
+contracts/cache/
+contracts/typechain-types/
+contracts/.openzeppelin/
+contracts/deployments/
+contracts/coverage/
+contracts/coverage.json
+contracts/.coverage_artifacts/
+contracts/.coverage_cache/
+contracts/.coverage_contracts/
+
+# Hardhat files
+contracts/.hardhat/
+
+# Gas reporter
+contracts/gas-report.txt
+
+# =================================================================
+# DATABASE
+# =================================================================
+# Prisma
+backend/prisma/migrations/dev.db*
+backend/prisma/dev.db*
+*.db
+*.db-journal
+
+# Database dumps
+*.sql
+*.dump
+
+# =================================================================
+# LOGS
+# =================================================================
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# =================================================================
+# OPERATING SYSTEM
+# =================================================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.tmp
+*.temp
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# =================================================================
+# IDEs & EDITORS
+# =================================================================
+# VSCode
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+
+# Local History for Visual Studio Code
+.history/
+
+# JetBrains IDEs
+.idea/
+*.swp
+*.swo
+*~
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*.un~
+Session.vim
+.netrwhist
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# =================================================================
+# TESTING
+# =================================================================
+# Test results
+test-results/
+playwright-report/
+test-results.xml
+coverage/
+.coverage
+
+# Jest
+jest-coverage/
+
+# =================================================================
+# DOCKER
+# =================================================================
+# Docker volumes
+docker-data/
+.docker/
+
+# =================================================================
+# DEPLOYMENT
+# =================================================================
+# Deployment artifacts
+deployment/
+deploy/
+.serverless/
+.vercel/
+.netlify/
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+
+# =================================================================
+# MONITORING & ANALYTICS
+# =================================================================
+# Logs
+*.log
+logs/
+.logs/
+
+# Monitoring data
+monitoring/
+metrics/
+
+# =================================================================
+# BACKUP FILES
+# =================================================================
+*.bak
+*.backup
+*.old
+*.orig
+*.save
+*.tmp
+
+# =================================================================
+# IPFS
+# =================================================================
+.ipfs/
+ipfs-data/
+
+# =================================================================
+# TEMPORARY FILES
+# =================================================================
+tmp/
+temp/
+.tmp/
+.temp/
+
+# =================================================================
+# CUSTOM PROJECT FILES
+# =================================================================
+# Documentation builds
+docs/build/
+docs/_build/
+
+# Scripts that contain sensitive data
+scripts/deploy-private.sh
+scripts/backup-private.sh
+
+# Local configuration files
+config/local.json
+config/private.json
+
+# User uploads (if stored locally)
+uploads/
+user-files/
+
+# Generated files
+generated/
+auto-generated/
+
+# =================================================================
+# PACKAGE MANAGERS
+# =================================================================
+# Yarn
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# pnpm
+.pnpm-store/
+
+# =================================================================
+# PERFORMANCE & PROFILING
+# =================================================================
+# Performance logs
+*.perf
+profile/
+.clinic/
+
+# =================================================================
+# SECURITY TOOLS
+# =================================================================
+# Security scan results
+security-report.html
+security-report.json
+.scannerwork/
+
+# =================================================================
+# BUILD TOOLS
+# =================================================================
+# Webpack
+.webpack/
+
+# Rollup
+.rollup.cache/
+
+# Parcel
+.parcel-cache/
+
+# =================================================================
+# MISCELLANEOUS
+# =================================================================
+# Local storage
+.local/
+.cache/
+
+# Runtime configuration
+runtime.json
+
+# Process files
+.pid
+
+# Lock files (uncomment if you want to ignore them)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml

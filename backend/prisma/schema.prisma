@@ -1,0 +1,498 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String   @id @default(cuid())
+  walletAddress     String   @unique
+  nonce             String?
+  profileHash       String?
+  name              String?
+  email             String?
+  bio               String?
+  avatar            String?
+  userType          UserType @default(BOTH)
+  reputation        Float    @default(500)
+  totalJobs         Int      @default(0)
+  successfulJobs    Int      @default(0)
+  totalEarnings     Decimal  @default(0) @db.Decimal(18, 8)
+  isVerified        Boolean  @default(false)
+  isActive          Boolean  @default(true)
+  lastSeen          DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  jobsAsClient      Job[]           @relation("ClientJobs")
+  jobsAsFreelancer  Job[]           @relation("FreelancerJobs")
+  proposals         Proposal[]
+  skills            UserSkill[]
+  reviews           Review[]        @relation("ReviewsReceived")
+  reviewsGiven      Review[]        @relation("ReviewsGiven")
+  notifications     Notification[]
+  contracts         Contract[]      @relation("ClientContracts")
+  freelancerContracts Contract[]    @relation("FreelancerContracts")
+  disputes          Dispute[]       @relation("DisputeParticipant")
+  arbitrations      Dispute[]       @relation("DisputeArbitrator")
+  messages          Message[]
+  attachments       Attachment[]
+
+  @@map("users")
+}
+
+enum UserType {
+  CLIENT
+  FREELANCER
+  BOTH
+}
+
+model Job {
+  id               String     @id @default(cuid())
+  blockchainId     BigInt?    @unique
+  title            String
+  description      String
+  category         String
+  budget           Decimal    @db.Decimal(18, 8)
+  paymentToken     String     @default("0x0000000000000000000000000000000000000000")
+  deadline         DateTime
+  status           JobStatus  @default(OPEN)
+  ipfsHash         String?
+  clientId         String
+  freelancerId     String?
+  escrowId         BigInt?
+  escrowReleased   Boolean    @default(false)
+  isUrgent         Boolean    @default(false)
+  experienceLevel  ExperienceLevel @default(INTERMEDIATE)
+  estimatedHours   Int?
+  completedAt      DateTime?
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+
+  // Relations
+  client           User       @relation("ClientJobs", fields: [clientId], references: [id])
+  freelancer       User?      @relation("FreelancerJobs", fields: [freelancerId], references: [id])
+  proposals        Proposal[]
+  skills           JobSkill[]
+  attachments      Attachment[]
+  contract         Contract?
+  dispute          Dispute?
+  milestones       Milestone[]
+  messages         Message[]
+
+  @@map("jobs")
+}
+
+enum JobStatus {
+  OPEN
+  ASSIGNED
+  IN_PROGRESS
+  SUBMITTED
+  COMPLETED
+  DISPUTED
+  CANCELLED
+}
+
+enum ExperienceLevel {
+  ENTRY
+  INTERMEDIATE
+  EXPERT
+}
+
+model Proposal {
+  id             String    @id @default(cuid())
+  jobId          String
+  freelancerId   String
+  amount         Decimal   @db.Decimal(18, 8)
+  deliveryTime   Int       // days
+  coverLetter    String
+  portfolioItems Json?
+  stakedAmount   Decimal   @db.Decimal(18, 8)
+  status         ProposalStatus @default(PENDING)
+  isHighlighted  Boolean   @default(false)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  // Relations
+  job            Job       @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  freelancer     User      @relation(fields: [freelancerId], references: [id])
+
+  @@unique([jobId, freelancerId])
+  @@map("proposals")
+}
+
+enum ProposalStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  WITHDRAWN
+}
+
+model Contract {
+  id               String        @id @default(cuid())
+  jobId            String        @unique
+  clientId         String
+  freelancerId     String
+  amount           Decimal       @db.Decimal(18, 8)
+  paymentToken     String
+  startDate        DateTime
+  endDate          DateTime
+  status           ContractStatus @default(ACTIVE)
+  escrowAddress    String?
+  terms            String?
+  weeklyLimit      Int?          // Hours per week
+  hourlyRate       Decimal?      @db.Decimal(10, 2)
+  isHourly         Boolean       @default(false)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  // Relations
+  job              Job           @relation(fields: [jobId], references: [id])
+  client           User          @relation("ClientContracts", fields: [clientId], references: [id])
+  freelancer       User          @relation("FreelancerContracts", fields: [freelancerId], references: [id])
+  milestones       Milestone[]
+  payments         Payment[]
+  timeEntries      TimeEntry[]
+
+  @@map("contracts")
+}
+
+enum ContractStatus {
+  ACTIVE
+  COMPLETED
+  CANCELLED
+  DISPUTED
+  PAUSED
+}
+
+model Milestone {
+  id           String          @id @default(cuid())
+  contractId   String
+  jobId        String
+  title        String
+  description  String
+  amount       Decimal         @db.Decimal(18, 8)
+  dueDate      DateTime
+  status       MilestoneStatus @default(PENDING)
+  deliverables Json?
+  feedback     String?
+  completedAt  DateTime?
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  // Relations
+  contract     Contract        @relation(fields: [contractId], references: [id])
+  job          Job             @relation(fields: [jobId], references: [id])
+  payment      Payment?
+
+  @@map("milestones")
+}
+
+enum MilestoneStatus {
+  PENDING
+  IN_PROGRESS
+  SUBMITTED
+  APPROVED
+  REJECTED
+  DISPUTED
+}
+
+model Payment {
+  id            String        @id @default(cuid())
+  contractId    String
+  milestoneId   String?       @unique
+  amount        Decimal       @db.Decimal(18, 8)
+  paymentToken  String
+  txHash        String?
+  blockNumber   BigInt?
+  gasUsed       BigInt?
+  gasFee        Decimal?      @db.Decimal(18, 8)
+  status        PaymentStatus @default(PENDING)
+  paidAt        DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  // Relations
+  contract      Contract      @relation(fields: [contractId], references: [id])
+  milestone     Milestone?    @relation(fields: [milestoneId], references: [id])
+
+  @@map("payments")
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+model TimeEntry {
+  id          String    @id @default(cuid())
+  contractId  String
+  description String
+  hours       Decimal   @db.Decimal(4, 2)
+  date        DateTime
+  status      TimeEntryStatus @default(PENDING)
+  screenshot  String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  contract    Contract  @relation(fields: [contractId], references: [id])
+
+  @@map("time_entries")
+}
+
+enum TimeEntryStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model Dispute {
+  id              String        @id @default(cuid())
+  jobId           String        @unique
+  raisedBy        String
+  reason          String
+  description     String
+  status          DisputeStatus @default(OPEN)
+  evidence        Json?
+  arbitrators     String[]
+  votes           Json?
+  resolution      String?
+  amount          Decimal?      @db.Decimal(18, 8)
+  clientPayout    Decimal?      @db.Decimal(18, 8)
+  freelancerPayout Decimal?     @db.Decimal(18, 8)
+  resolvedAt      DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relations
+  job             Job           @relation(fields: [jobId], references: [id])
+  participant     User          @relation("DisputeParticipant", fields: [raisedBy], references: [id])
+
+  @@map("disputes")
+}
+
+enum DisputeStatus {
+  OPEN
+  VOTING
+  RESOLVED
+  APPEALED
+}
+
+model Review {
+  id           String   @id @default(cuid())
+  fromUserId   String
+  toUserId     String
+  jobId        String?
+  contractId   String?
+  rating       Int      @db.SmallInt
+  comment      String?
+  categories   Json?    // { quality: 5, communication: 4, timeliness: 5 }
+  isPublic     Boolean  @default(true)
+  isVerified   Boolean  @default(false)
+  helpfulVotes Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  fromUser     User     @relation("ReviewsGiven", fields: [fromUserId], references: [id])
+  toUser       User     @relation("ReviewsReceived", fields: [toUserId], references: [id])
+
+  @@unique([fromUserId, toUserId, jobId])
+  @@map("reviews")
+}
+
+model Skill {
+  id          String      @id @default(cuid())
+  name        String      @unique
+  category    String
+  description String?
+  isVerified  Boolean     @default(false)
+  popularity  Int         @default(0)
+  createdAt   DateTime    @default(now())
+
+  // Relations
+  userSkills  UserSkill[]
+  jobSkills   JobSkill[]
+
+  @@map("skills")
+}
+
+model UserSkill {
+  id        String @id @default(cuid())
+  userId    String
+  skillId   String
+  level     Int    @db.SmallInt // 1-5
+  verified  Boolean @default(false)
+  experience String? // Years of experience
+  certifications Json? // Array of certification objects
+
+  // Relations
+  user      User   @relation(fields: [userId], references: [id])
+  skill     Skill  @relation(fields: [skillId], references: [id])
+
+  @@unique([userId, skillId])
+  @@map("user_skills")
+}
+
+model JobSkill {
+  id      String @id @default(cuid())
+  jobId   String
+  skillId String
+  level   Int    @db.SmallInt // Required level 1-5
+  required Boolean @default(true)
+
+  // Relations
+  job     Job    @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  skill   Skill  @relation(fields: [skillId], references: [id])
+
+  @@unique([jobId, skillId])
+  @@map("job_skills")
+}
+
+model Attachment {
+  id          String      @id @default(cuid())
+  jobId       String?
+  userId      String?
+  filename    String
+  originalName String
+  mimeType    String
+  size        Int
+  ipfsHash    String?
+  url         String
+  isPublic    Boolean     @default(true)
+  description String?
+  createdAt   DateTime    @default(now())
+
+  // Relations
+  job         Job?        @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  user        User?       @relation(fields: [userId], references: [id])
+
+  @@map("attachments")
+}
+
+model Message {
+  id          String      @id @default(cuid())
+  jobId       String?
+  senderId    String
+  content     String
+  messageType MessageType @default(TEXT)
+  attachments Json?
+  isRead      Boolean     @default(false)
+  isSystem    Boolean     @default(false)
+  editedAt    DateTime?
+  createdAt   DateTime    @default(now())
+
+  // Relations
+  job         Job?        @relation(fields: [jobId], references: [id])
+  sender      User        @relation(fields: [senderId], references: [id])
+
+  @@map("messages")
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  FILE
+  SYSTEM
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType
+  title     String
+  message   String
+  data      Json?
+  read      Boolean          @default(false)
+  actionUrl String?
+  priority  NotificationPriority @default(NORMAL)
+  expiresAt DateTime?
+  createdAt DateTime         @default(now())
+
+  // Relations
+  user      User             @relation(fields: [userId], references: [id])
+
+  @@map("notifications")
+}
+
+enum NotificationType {
+  JOB_CREATED
+  PROPOSAL_RECEIVED
+  PROPOSAL_ACCEPTED
+  PROPOSAL_REJECTED
+  WORK_SUBMITTED
+  WORK_APPROVED
+  PAYMENT_RELEASED
+  DISPUTE_RAISED
+  DISPUTE_RESOLVED
+  MESSAGE_RECEIVED
+  MILESTONE_COMPLETED
+  DEADLINE_APPROACHING
+  SYSTEM_UPDATE
+  SECURITY_ALERT
+}
+
+enum NotificationPriority {
+  LOW
+  NORMAL
+  HIGH
+  CRITICAL
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  icon        String?
+  parentId    String?
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  // Relations
+  parent      Category? @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children    Category[] @relation("CategoryHierarchy")
+
+  @@map("categories")
+}
+
+model Platform {
+  id              String   @id @default(cuid())
+  totalJobs       Int      @default(0)
+  completedJobs   Int      @default(0)
+  totalUsers      Int      @default(0)
+  totalFreelancers Int     @default(0)
+  totalClients    Int      @default(0)
+  totalPayouts    Decimal  @default(0) @db.Decimal(18, 8)
+  activeDisputes  Int      @default(0)
+  resolvedDisputes Int     @default(0)
+  lastUpdated     DateTime @default(now())
+
+  @@map("platform_stats")
+}
+
+model BlockchainEvent {
+  id            String   @id @default(cuid())
+  eventName     String
+  contractAddress String
+  blockNumber   BigInt
+  transactionHash String @unique
+  jobId         String?
+  userId        String?
+  data          Json
+  processed     Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  @@index([eventName, contractAddress])
+  @@index([blockNumber])
+  @@index([processed])
+  @@map("blockchain_events")
+}

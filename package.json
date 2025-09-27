@@ -1,0 +1,118 @@
+{
+  "name": "blockchain-freelancing-platform",
+  "version": "1.0.0",
+  "description": "A revolutionary decentralized freelancing platform built on blockchain technology",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run dev:contracts\" \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:all": "npm run install:all && npm run dev",
+    "dev:contracts": "cd contracts && npm run node",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build": "npm run build:contracts && npm run build:backend && npm run build:frontend",
+    "build:all": "npm run install:all && npm run build",
+    "build:contracts": "cd contracts && npm run build",
+    "build:backend": "cd backend && npm run build",
+    "build:frontend": "cd frontend && npm run build",
+    "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
+    "start:backend": "cd backend && npm start",
+    "start:frontend": "cd frontend && npm start",
+    "start:prod": "npm run start",
+    "test": "npm run test:contracts && npm run test:backend && npm run test:frontend",
+    "test:all": "npm run test",
+    "test:contracts": "cd contracts && npm test",
+    "test:backend": "cd backend && npm test",
+    "test:frontend": "cd frontend && npm test",
+    "test:coverage": "npm run test:contracts:coverage && npm run test:backend:coverage && npm run test:frontend:coverage",
+    "test:contracts:coverage": "cd contracts && npm run coverage",
+    "test:backend:coverage": "cd backend && npm run test:coverage",
+    "test:frontend:coverage": "cd frontend && npm run test:coverage",
+    "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install && cd ../contracts && npm install && cd ..",
+    "clean": "npm run clean:contracts && npm run clean:backend && npm run clean:frontend",
+    "clean:contracts": "cd contracts && npm run clean",
+    "clean:backend": "cd backend && npm run clean",
+    "clean:frontend": "cd frontend && npm run clean",
+    "lint": "npm run lint:contracts && npm run lint:backend && npm run lint:frontend",
+    "lint:contracts": "cd contracts && npm run lint",
+    "lint:backend": "cd backend && npm run lint",
+    "lint:frontend": "cd frontend && npm run lint",
+    "format": "npm run format:contracts && npm run format:backend && npm run format:frontend",
+    "format:contracts": "cd contracts && npm run format",
+    "format:backend": "cd backend && npm run format",
+    "format:frontend": "cd frontend && npm run format",
+    "type-check": "npm run type-check:backend && npm run type-check:frontend",
+    "type-check:backend": "cd backend && npm run type-check",
+    "type-check:frontend": "cd frontend && npm run type-check",
+    "check:all": "npm run lint && npm run type-check && npm run test",
+    "deploy:contracts": "cd contracts && npm run deploy",
+    "deploy:contracts:testnet": "cd contracts && npm run deploy:testnet",
+    "deploy:contracts:mainnet": "cd contracts && npm run deploy:mainnet",
+    "deploy:backend": "cd backend && npm run deploy",
+    "deploy:frontend": "cd frontend && npm run deploy",
+    "deploy:all": "npm run deploy:contracts && npm run deploy:backend && npm run deploy:frontend",
+    "verify:contracts": "cd contracts && npm run verify",
+    "security:scan": "./scripts/security-scan.sh",
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
+    "prepare": "husky install"
+  },
+  "keywords": [
+    "blockchain",
+    "freelancing",
+    "ethereum",
+    "web3",
+    "decentralized",
+    "smart-contracts",
+    "nextjs",
+    "typescript",
+    "hardhat",
+    "solidity"
+  ],
+  "author": "FreelanceDAO Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@commitlint/cli": "^17.7.1",
+    "@commitlint/config-conventional": "^17.7.0",
+    "concurrently": "^8.2.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.2.3"
+  },
+  "lint-staged": {
+    "**/*.{js,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "**/*.{sol}": [
+      "solhint --fix",
+      "prettier --write"
+    ],
+    "**/*.{json,md,yml,yaml}": [
+      "prettier --write"
+    ]
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/blockchain-freelancing-platform.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-org/blockchain-freelancing-platform/issues"
+  },
+  "homepage": "https://freelancedao.com"
+}
