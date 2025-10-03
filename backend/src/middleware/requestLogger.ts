@@ -98,7 +98,7 @@ export const enhancedRequestLogger = (req: Request, res: Response, next: any) =>
     });
 
     // Call original end method
-    originalEnd.call(this, chunk, encoding);
+    return originalEnd.call(this, chunk, encoding);
   };
 
   next();

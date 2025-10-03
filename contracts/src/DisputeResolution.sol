@@ -144,7 +144,7 @@ contract DisputeResolution is Ownable, Pausable, ReentrancyGuard {
     error NotArbitrator();
     error InsufficientStake();
     error InvalidVote();
-    error ArbitratorSlashed();
+    error ArbitratorAlreadySlashed();
     error InvalidAmount();
     error AppealPeriodEnded();
 
@@ -162,7 +162,7 @@ contract DisputeResolution is Ownable, Pausable, ReentrancyGuard {
 
     constructor(
         address _userRegistry,
-        address _escrowManager,
+        address payable _escrowManager,
         address _governanceToken
     ) {
         userRegistry = UserRegistry(_userRegistry);
@@ -270,7 +270,7 @@ contract DisputeResolution is Ownable, Pausable, ReentrancyGuard {
         // Simple pseudo-random selection (in production, use Chainlink VRF)
         address[] memory selectedArbitrators = new address[](ARBITRATOR_COUNT);
         uint256 selectedCount = 0;
-        uint256 nonce = uint256(keccak256(abi.encodePacked(block.timestamp, block.difficulty, _disputeId)));
+        uint256 nonce = uint256(keccak256(abi.encodePacked(block.timestamp, block.prevrandao, _disputeId)));
 
         for (uint256 i = 0; i < activeArbitrators.length && selectedCount < ARBITRATOR_COUNT; i++) {
             uint256 randomIndex = (nonce + i) % activeArbitrators.length;

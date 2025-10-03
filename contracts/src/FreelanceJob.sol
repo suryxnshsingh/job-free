@@ -218,7 +218,7 @@ contract FreelanceJob is Ownable, Pausable, ReentrancyGuard {
 
     constructor(
         address _userRegistry,
-        address _escrowManager,
+        address payable _escrowManager,
         address _disputeResolution,
         address _governanceToken
     ) {
@@ -259,7 +259,7 @@ contract FreelanceJob is Ownable, Pausable, ReentrancyGuard {
         if (_skillIds.length != _skillLevels.length) revert InvalidSkillLevel();
         
         // Check if user is registered
-        (address userAddress,,,,,,,) = userRegistry.users(msg.sender);
+        (address userAddress,,,,,,,,,,) = userRegistry.users(msg.sender);
         if (userAddress == address(0)) revert NotAuthorized();
 
         jobId = nextJobId++;
@@ -332,7 +332,7 @@ contract FreelanceJob is Ownable, Pausable, ReentrancyGuard {
         if (block.timestamp > job.deadline) revert DeadlineExceeded();
 
         // Check if user is registered and meets requirements
-        (address userAddress,,,,,,,) = userRegistry.users(msg.sender);
+        (address userAddress,,,,,,,,,,) = userRegistry.users(msg.sender);
         if (userAddress == address(0)) revert NotAuthorized();
         
         // Check staking requirement
@@ -384,20 +384,20 @@ contract FreelanceJob is Ownable, Pausable, ReentrancyGuard {
         Job storage job = jobs[_jobId];
         
         // Find the accepted bid
-        Bid storage acceptedBid;
-        bool bidFound = false;
+        uint256 acceptedBidIndex = type(uint256).max;
         
         for (uint256 i = 0; i < jobBids[_jobId].length; i++) {
             if (jobBids[_jobId][i].freelancer == _freelancer && 
                 jobBids[_jobId][i].status == BidStatus.Active) {
-                acceptedBid = jobBids[_jobId][i];
-                acceptedBid.status = BidStatus.Accepted;
-                bidFound = true;
+                acceptedBidIndex = i;
+                jobBids[_jobId][i].status = BidStatus.Accepted;
                 break;
             }
         }
         
-        if (!bidFound) revert BidNotFound();
+        if (acceptedBidIndex == type(uint256).max) revert BidNotFound();
+        
+        Bid storage acceptedBid = jobBids[_jobId][acceptedBidIndex];
 
         // Update job
         job.freelancer = _freelancer;

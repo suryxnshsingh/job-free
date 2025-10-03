@@ -13,7 +13,7 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
  * @dev ERC20 token with governance capabilities, staking rewards, and security features
  * @author FreelanceDAO Team
  */
-contract GovernanceToken is ERC20, ERC20Votes, ERC20Permit, Ownable, Pausable, ReentrancyGuard {
+contract GovernanceToken is ERC20, ERC20Permit, ERC20Votes, Ownable, Pausable, ReentrancyGuard {
     // Token constants
     uint256 public constant MAX_SUPPLY = 1_000_000_000 * 10**18; // 1B tokens
     uint256 public constant INITIAL_SUPPLY = 100_000_000 * 10**18; // 100M tokens

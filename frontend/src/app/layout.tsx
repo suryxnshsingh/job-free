@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { Inter } from 'next/font/google'
 import "./globals.css";
-import { Header } from '@/components/layout/Header'
-import { Footer } from '@/components/layout/Footer'
+import { Web3Provider } from '@/contexts/Web3Context'
+import { ThemeProvider } from '@/contexts/ThemeContext'
+import Navigation from '@/components/Navigation'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -34,15 +35,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={inter.variable}>
-      <body className="min-h-screen bg-background font-sans antialiased">
-        <div className="relative flex min-h-screen flex-col">
-          <Header />
-          <main className="flex-1">
-            {children}
-          </main>
-          <Footer />
-        </div>
+    <html lang="en" className={`${inter.variable} scroll-smooth`}>
+      <body className="min-h-screen bg-background font-sans antialiased transition-colors duration-300">
+        <ThemeProvider>
+          <Web3Provider>
+            <div className="relative flex min-h-screen flex-col">
+              <Navigation />
+              <main className="flex-1 pt-16">
+                {children}
+              </main>
+            </div>
+          </Web3Provider>
+        </ThemeProvider>
       </body>
     </html>
   );

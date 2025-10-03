@@ -275,6 +275,7 @@ model Dispute {
   // Relations
   job             Job           @relation(fields: [jobId], references: [id])
   participant     User          @relation("DisputeParticipant", fields: [raisedBy], references: [id])
+  arbitratorUsers User[]        @relation("DisputeArbitrator")
 
   @@map("disputes")
 }
